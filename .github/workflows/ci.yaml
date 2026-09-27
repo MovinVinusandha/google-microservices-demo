@@ -1,0 +1,68 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+
+jobs:
+  build-and-security-scan:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_REPOSITORY: "movinvinusandha"
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        include:
+          - service: frontend
+            context: ./src/frontend
+          - service: cartservice
+            context: ./src/cartservice/src
+          - service: productcatalogservice
+            context: ./src/productcatalogservice
+          - service: currencyservice
+            context: ./src/currencyservice
+          - service: paymentservice
+            context: ./src/paymentservice
+          - service: shippingservice
+            context: ./src/shippingservice
+          - service: emailservice
+            context: ./src/emailservice
+          - service: checkoutservice
+            context: ./src/checkoutservice
+          - service: recommendationservice
+            context: ./src/recommendationservice
+          - service: adservice
+            context: ./src/adservice
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker Image
+        run: |
+          docker build -t ghcr.io/${{ env.GITHUB_REPOSITORY }}/${{ matrix.service }}:${{ github.sha }} ${{ matrix.context }}
+
+      - name: Run Trivy Vulnerability Scanner
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: 'ghcr.io/${{ env.GITHUB_REPOSITORY }}/${{ matrix.service }}:${{ github.sha }}'
+          format: 'table'
+          exit-code: '0'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Push Image to Registry
+        run: |
+          docker push ghcr.io/${{ env.GITHUB_REPOSITORY }}/${{ matrix.service }}:${{ github.sha }}
