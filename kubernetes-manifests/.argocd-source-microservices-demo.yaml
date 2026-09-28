@@ -1,7 +1,7 @@
 kustomize:
   images:
-  - ghcr.io/movinvinusandha/frontend:94a553d73f7e732ec5129d0fd52adf2852e697ad
-  - ghcr.io/movinvinusandha/cartservice:94a553d73f7e732ec5129d0fd52adf2852e697ad
+  - ghcr.io/movinvinusandha/frontend:latest
+  - ghcr.io/movinvinusandha/cartservice:latest
   - ghcr.io/movinvinusandha/productcatalogservice:latest
   - ghcr.io/movinvinusandha/currencyservice:latest
   - ghcr.io/movinvinusandha/paymentservice:latest
