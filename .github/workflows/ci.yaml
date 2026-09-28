@@ -37,6 +37,8 @@ jobs:
             context: ./src/recommendationservice
           - service: adservice
             context: ./src/adservice
+          - service: loadgenerator
+            context: ./src/loadgenerator
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -53,7 +55,10 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t ghcr.io/${{ env.GITHUB_REPOSITORY }}/${{ matrix.service }}:${{ github.sha }} ${{ matrix.context }}
+          docker build \
+            -t ghcr.io/${{ env.GITHUB_REPOSITORY }}/${{ matrix.service }}:${{ github.sha }} \
+            -t ghcr.io/${{ env.GITHUB_REPOSITORY }}/${{ matrix.service }}:latest \
+            ${{ matrix.context }}
 
       - name: Run Trivy Vulnerability Scanner
         uses: aquasecurity/trivy-action@v0.36.0
@@ -66,3 +71,4 @@ jobs:
       - name: Push Image to Registry
         run: |
           docker push ghcr.io/${{ env.GITHUB_REPOSITORY }}/${{ matrix.service }}:${{ github.sha }}
+          docker push ghcr.io/${{ env.GITHUB_REPOSITORY }}/${{ matrix.service }}:latest
