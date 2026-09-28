@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: microservices-demo
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: frontend=ghcr.io/movinvinusandha/frontend,cartservice=ghcr.io/movinvinusandha/cartservice,productcatalogservice=ghcr.io/movinvinusandha/productcatalogservice,currencyservice=ghcr.io/movinvinusandha/currencyservice,paymentservice=ghcr.io/movinvinusandha/paymentservice,shippingservice=ghcr.io/movinvinusandha/shippingservice,emailservice=ghcr.io/movinvinusandha/emailservice,checkoutservice=ghcr.io/movinvinusandha/checkoutservice,recommendationservice=ghcr.io/movinvinusandha/recommendationservice,adservice=ghcr.io/movinvinusandha/adservice,loadgenerator=ghcr.io/movinvinusandha/loadgenerator
+    argocd-image-updater.argoproj.io/frontend.update-strategy: latest
+    argocd-image-updater.argoproj.io/cartservice.update-strategy: latest
+    argocd-image-updater.argoproj.io/write-back-method: git:secret:argocd/git-creds
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/MovinVinusandha/google-microservices-demo.git'
+    targetRevision: main
+    path: kubernetes-manifests
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
