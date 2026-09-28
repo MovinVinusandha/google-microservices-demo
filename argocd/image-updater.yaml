@@ -1,0 +1,22 @@
+# ArgoCD Image Updater Configuration for GHCR
+#
+# NOTE: The 'git-creds' secret is intentionally NOT stored in this file to prevent committing secrets to Git.
+#
+# To create the secret safely (without committing to Git), run:
+# kubectl create secret generic git-creds \
+#   -n argocd \
+#   --from-literal=username=MovinVinusandha \
+#   --from-literal=password=<YOUR_GITHUB_PAT>
+#
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-image-updater-config
+  namespace: argocd
+data:
+  registries.conf: |
+    registries:
+      - name: GitHub Container Registry
+        api_url: https://ghcr.io
+        prefix: ghcr.io
+        credentials: secret:argocd/git-creds#username:password
