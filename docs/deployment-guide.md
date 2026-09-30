@@ -43,7 +43,6 @@ flowchart TD
     subgraph OBSERVABILITY ["Observability & Monitoring (Namespace: monitoring)"]
         ALB -->|https://grafana...| GRAFANA["Grafana Dashboards"]
         PROM["Prometheus Server + Node Exporter + KSM"]
-        AM["Alertmanager"] --> SLACK["Slack Channel #alerts"]
         SERVICES --> PROM
         PROM --> GRAFANA
     end
@@ -130,13 +129,9 @@ kubectl apply -f argocd/application.yaml
 
 ### Phase 3: Observability & Monitoring (`kube-prometheus-stack`)
 
-1. Create the `monitoring` namespace and optional Slack secret:
+1. Create the `monitoring` namespace:
    ```bash
    kubectl create ns monitoring
-
-   kubectl create secret generic alertmanager-slack-webhook \
-     --from-literal=slack-webhook-url="https://hooks.slack.com/services/YOUR/SLACK/WEBHOOK" \
-     -n monitoring
    ```
 
 2. Add the Prometheus Community Helm repository:
@@ -145,7 +140,7 @@ kubectl apply -f argocd/application.yaml
    helm repo update
    ```
 
-3. Deploy Prometheus, Alertmanager, Node Exporter, and Grafana:
+3. Deploy Prometheus, Node Exporter, and Grafana:
    ```bash
    helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheus-stack \
      --namespace monitoring \

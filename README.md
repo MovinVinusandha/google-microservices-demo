@@ -59,7 +59,6 @@ flowchart TD
 
     subgraph MONITORING ["Observability (Namespace: monitoring)"]
         PROM["Prometheus + Node Exporter + KSM"]
-        AM["Alertmanager"] --> SLACK["Slack Channel Notifications"]
         ALB --> GRAFANA["Grafana Dashboards"]
         MICROSERVICES --> PROM
         PROM --> GRAFANA
@@ -79,7 +78,7 @@ flowchart TD
 - **Automated CI/CD:** Matrix builds for 11 microservices on GitHub Actions, security scanned with Trivy, pushing immutable commit SHAs to `ghcr.io`.
 - **Zero-Touch GitOps:** ArgoCD Image Updater automatically discovers new images in GitHub Container Registry and commits them back to Git; GitHub push webhooks notify ArgoCD for sub-second zero-delay deployments.
 - **Dynamic Ingress & DNS:** AWS ALB provisioned automatically by EKS Auto Mode with Route 53 DNS records generated dynamically by ExternalDNS.
-- **Production Observability:** Full Prometheus & Grafana stack pre-configured with Kubernetes cluster, node, and pod dashboards, with Alertmanager routing alerts to Slack.
+- **Production Observability:** Full Prometheus & Grafana stack pre-configured with Kubernetes cluster, node, and pod metrics and operational dashboards.
 - **Centralized EFK Logging:** Fluent Bit lightweight DaemonSet streaming parsed JSON container logs to Elasticsearch backed by dynamic AWS EBS storage (`ebs-sc`), queryable in real-time in Kibana.
 - **Autoscaling & Resilience:** High-Availability Horizontal Pod Autoscaler (HPA) scaling the frontend between 2 and 6 pods under load, protected by PodDisruptionBudgets (PDB) for `frontend`, `cartservice`, and `grafana` (`minAvailable: 1`).
 - **Node Stability & Disruption Controls:** EKS Auto Mode dual NodePool architecture (`general-purpose` and `system`) with Karpenter disruption controls (`karpenter.sh/do-not-disrupt: "true"`) protecting stateful and critical platform workloads (Elasticsearch, Prometheus, Grafana, Kibana) against unexpected node consolidation evictions and ALB 503 flapping.
