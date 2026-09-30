@@ -1,0 +1,36 @@
+# Kibana Helm values
+resources:
+  requests:
+    cpu: "250m"
+    memory: "512Mi"
+  limits:
+    cpu: "500m"
+    memory: "1Gi"
+
+elasticsearchHosts: "http://elasticsearch-master:9200"
+
+kibanaConfig:
+  kibana.yml: |
+    server.host: "0.0.0.0"
+    elasticsearch.hosts: [ "http://elasticsearch-master:9200" ]
+    elasticsearch.ssl.verificationMode: none
+    xpack.security.enabled: false
+
+readinessProbe:
+  failureThreshold: 10
+  initialDelaySeconds: 60
+  periodSeconds: 10
+  successThreshold: 1
+  timeoutSeconds: 10
+  exec:
+    command:
+      - /bin/bash
+      - -c
+      - |
+        #!/bin/bash
+        set -e
+        STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:5601/api/status)
+        if [ "$STATUS" -eq 200 ] || [ "$STATUS" -eq 302 ]; then
+          exit 0
+        fi
+        exit 1

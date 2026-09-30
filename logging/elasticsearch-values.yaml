@@ -1,0 +1,37 @@
+# Elasticsearch Helm Values for single-node cluster
+replicas: 1
+minimumMasterNodes: 1
+
+resources:
+  requests:
+    cpu: "1000m"
+    memory: "2Gi"
+  limits:
+    cpu: "2000m"
+    memory: "3Gi"
+
+volumeClaimTemplate:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: "ebs-sc"
+  resources:
+    requests:
+      storage: 15Gi
+
+esJavaOpts: "-Xmx1536m -Xms1536m"
+
+# Accept yellow status on single node and allow longer timeout
+clusterHealthCheckParams: "wait_for_status=yellow&timeout=15s"
+
+readinessProbe:
+  failureThreshold: 5
+  initialDelaySeconds: 30
+  periodSeconds: 15
+  successThreshold: 1
+  timeoutSeconds: 15
+
+# Disable GeoIP downloader & trial security restrictions
+esConfig:
+  elasticsearch.yml: |
+    xpack.security.enabled: false
+    xpack.monitoring.collection.enabled: false
+    ingest.geoip.downloader.enabled: false
