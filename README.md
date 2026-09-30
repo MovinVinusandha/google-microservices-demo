@@ -82,6 +82,7 @@ flowchart TD
 - **Production Observability:** Full Prometheus & Grafana stack pre-configured with Kubernetes cluster, node, and pod dashboards, with Alertmanager routing alerts to Slack.
 - **Centralized EFK Logging:** Fluent Bit lightweight DaemonSet streaming parsed JSON container logs to Elasticsearch backed by dynamic AWS EBS storage (`ebs-sc`), queryable in real-time in Kibana.
 - **Autoscaling & Resilience:** Horizontal Pod Autoscaler (HPA) dynamically scaling the frontend between 1 and 6 pods under load, protected by PodDisruptionBudgets (PDB).
+- **Node Stability & Disruption Controls:** EKS Auto Mode / Karpenter disruption controls (`karpenter.sh/do-not-disrupt: "true"`) protecting stateful and critical platform workloads (Elasticsearch, Prometheus, Grafana, Kibana) against unexpected node consolidation evictions and ALB 503 flapping.
 
 ---
 

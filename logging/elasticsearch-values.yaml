@@ -2,6 +2,9 @@
 replicas: 1
 minimumMasterNodes: 1
 
+podAnnotations:
+  karpenter.sh/do-not-disrupt: "true"
+
 resources:
   requests:
     cpu: "1000m"

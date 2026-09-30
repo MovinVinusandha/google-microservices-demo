@@ -1,4 +1,7 @@
 # Kibana Helm values
+podAnnotations:
+  karpenter.sh/do-not-disrupt: "true"
+
 resources:
   requests:
     cpu: "250m"

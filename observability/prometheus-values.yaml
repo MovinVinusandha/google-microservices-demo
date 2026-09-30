@@ -1,10 +1,12 @@
 # Custom values for kube-prometheus-stack
-# Modeled after production GitOps setup with AWS EKS and Slack Alerting
+# Configured for EKS Auto Mode stability with do-not-disrupt
 
 grafana:
   enabled: true
   adminPassword: "prom-operator"
   defaultDashboardsEnabled: true
+  podAnnotations:
+    karpenter.sh/do-not-disrupt: "true"
   sidecar:
     dashboards:
       enabled: true
@@ -16,6 +18,9 @@ grafana:
 prometheus:
   enabled: true
   prometheusSpec:
+    podMetadata:
+      annotations:
+        karpenter.sh/do-not-disrupt: "true"
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false
     retention: 10d
