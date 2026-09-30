@@ -206,25 +206,32 @@ kubectl apply -f argocd/application.yaml
 
 ---
 
-### Phase 5: Scaling & Reliability (HPA & PDB)
+### Phase 5: Scaling & Reliability (HPA, PDB & NodePools)
 
 1. Install the Kubernetes Metrics Server:
    ```bash
    kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
    ```
 
-2. Apply Horizontal Pod Autoscaler and Pod Disruption Budget:
+2. Apply High-Availability HPA (Min 2 Replicas) & Pod Disruption Budgets (PDB):
    ```bash
    kubectl apply -f scaling/frontend-hpa.yaml
    kubectl apply -f scaling/frontend-pdb.yaml
+   kubectl apply -f scaling/cartservice-pdb.yaml
    ```
 
-3. Test Autoscaling under Load:
+3. High-Availability Multi-Replica & Node Stability Architecture:
+   - **`frontend`**: Scaled with `minReplicas: 2` (max 6) and guarded by `frontend-pdb` (`minAvailable: 1`).
+   - **`cartservice`**: Guarded by `cartservice-pdb` (`minAvailable: 1`).
+   - **`grafana`**: Deployed with `replicas: 2` and a built-in PodDisruptionBudget (`minAvailable: 1`).
+   - **EKS Auto Mode NodePools**: `general-purpose` handles user microservices with on-demand/spot scaling, while the dedicated `system` NodePool handles core Kubernetes system infrastructure (`CriticalAddonsOnly`). Platform pods (Prometheus, Elasticsearch, Kibana) utilize `karpenter.sh/do-not-disrupt: "true"` to guarantee zero node churn.
+
+4. Test Autoscaling under Load:
    ```bash
    # Scale up load generator to 150 concurrent shoppers
    kubectl set env deployment/loadgenerator USERS=150 RATE=10 -n default
 
-   # Watch frontend replicas scale up from 1 to 6
+   # Watch frontend replicas scale up from 2 to 6
    kubectl get hpa frontend-hpa -w
 
    # Reset back to baseline
